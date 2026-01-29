@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plant Growth Game</title>
+    <style>
+        body {
+            margin: 0;
+            background-color: #cceeff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+        }
+
+        #game-container {
+            position: relative;
+            width: 400px;
+            height: 600px;
+            border: 2px solid #333;
+            background-color: #a3d9a5;
+            overflow: hidden;
+            border-radius: 10px;
+        }
+
+        #sun {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 80px;
+            height: 80px;
+        }
+
+        #plant {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 150px;
+            transition: transform 0.5s;
+        }
+
+        .water-drop {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            pointer-events: none;
+            animation: fall 1s forwards;
+        }
+
+        @keyframes fall {
+            0% { transform: translateY(0); opacity: 1; }
+            100% { transform: translateY(400px); opacity: 0; }
+        }
+
+        #message {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255,255,255,0.8);
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <img src="images/sun.png" alt="Sun" id="sun">
+        <img src="images/plant_stage1.png" alt="Plant" id="plant">
+        <div id="water-container"></div>
+        <div id="message"></div>
+    </div>
+
+    <script>
+        const plant = document.getElementById("plant");
+        const gameContainer = document.getElementById("game-container");
+        const waterContainer = document.getElementById("water-container");
+        const message = document.getElementById("message");
+
+        let waterLevel = 0;  // 0 = dry, 10 = overwatered
+        let plantStage = 1;
+        let maxStage = 3;
+        let minWater = 2;
+        let maxWater = 8;
+
+        // Water plant when user clicks
+        gameContainer.addEventListener("click", (e) => {
+            const rect = gameContainer.getBoundingClientRect();
+            waterPlant(e.clientX - rect.left, e.clientY - rect.top);
+        });
+
+        function waterPlant(x, y) {
+            // Create water drop effect
+            const drop = document.createElement("img");
+            drop.src = "images/water_drop.png";
+            drop.className = "water-drop";
+            drop.style.left = `${x - 15}px`;
+            drop.style.top = `${y - 15}px`;
+            waterContainer.appendChild(drop);
+
+            setTimeout(() => {
+                drop.remove();
+            }, 1000);
+
+            // Update water level
+            waterLevel += 1;
+            checkPlantStatus();
+        }
+
+        function checkPlantStatus() {
+            if (waterLevel < minWater) {
+                message.textContent = "Plant is thirsty!";
+            } else if (waterLevel > maxWater) {
+                plant.src = "images/plant_dead.png";
+                message.textContent = "Too much water! Plant died!";
+                endGame();
+            } else {
+                message.textContent = "Plant is growing!";
+                growPlant();
+            }
+        }
+
+        function growPlant() {
+            if (plantStage < maxStage) {
+                plantStage += 1;
+                plant.src = `images/plant_stage${plantStage}.png`;
+                plant.style.transform = `translateX(-50%) scale(${1 + plantStage*0.2})`;
+            } else if (plantStage === maxStage) {
+                message.textContent = "Plant is fully grown!";
+            }
+        }
+
+        function endGame() {
+            gameContainer.removeEventListener("click", waterPlant);
+        }
+    </script>
+</body>
+</html>
