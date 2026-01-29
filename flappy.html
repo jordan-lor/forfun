@@ -2,82 +2,59 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Simple Flappy Game</title>
+  <title>Flappy Bird Clone</title>
+  <style>
+    body {
+      margin: 0;
+      background: #87CEEB;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      font-family: Arial, sans-serif;
+    }
+    canvas {
+      border: 2px solid black;
+      background: #87CEEB;
+    }
+  </style>
 </head>
 <body>
 
-<h2>Click to jump</h2>
-
-<canvas id="game" width="400" height="500" style="border:1px solid black;"></canvas>
+<canvas id="game" width="400" height="500"></canvas>
 
 <script>
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 
-// Bird
+// ---- Player ----
 let birdY = 250;
 let birdVelocity = 0;
 const gravity = 0.5;
 const jumpStrength = -8;
+const birdX = 80;
+const birdRadius = 12;
 
-// Pipe
-let pipeX = 400;
-let pipeGapY = 200;
+// ---- Pipe ----
+let pipeX = canvas.width;
+let gapY = 200;
 const gapHeight = 120;
 
-// Click to jump
-document.addEventListener("click", () => {
-  birdVelocity = jumpStrength;
+// ---- Score ----
+let score = 0;
+
+// ---- Controls ----
+document.addEventListener("keydown", (e) => {
+  if (e.code === "Space") {
+    birdVelocity = jumpStrength;
+  }
 });
 
+// ---- Game Loop ----
 function loop() {
   // Clear screen
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  // Background
-  ctx.fillStyle = "#87CEEB";
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-  // Bird physics
+  // ---- Bird physics ----
   birdVelocity += gravity;
-  birdY += birdVelocity;
-
-  // Draw bird
-  ctx.fillStyle = "yellow";
-  ctx.beginPath();
-  ctx.arc(80, birdY, 12, 0, Math.PI * 2);
-  ctx.fill();
-
-  // Move pipe
-  pipeX -= 2;
-  if (pipeX < -40) {
-    pipeX = canvas.width;
-    pipeGapY = Math.random() * 250 + 50;
-  }
-
-  // Draw pipes
-  ctx.fillStyle = "green";
-  ctx.fillRect(pipeX, 0, 40, pipeGapY);
-  ctx.fillRect(pipeX, pipeGapY + gapHeight, 40, canvas.height);
-
-  // Collision
-  if (
-    birdY < 0 ||
-    birdY > canvas.height ||
-    (80 > pipeX && 80 < pipeX + 40 &&
-     (birdY < pipeGapY || birdY > pipeGapY + gapHeight))
-  ) {
-    // Reset
-    birdY = 250;
-    birdVelocity = 0;
-    pipeX = canvas.width;
-  }
-
-  requestAnimationFrame(loop);
-}
-
-loop();
-</script>
-
-</body>
-</html>
+  birdY += birdVelo
