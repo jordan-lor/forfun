@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Canvas Test</title>
+</head>
+<body>
+
+<h1>If you see a blue box below, canvas works.</h1>
+
+<canvas id="c" width="300" height="300" style="border:5px solid red;"></canvas>
+
+<script>
+const canvas = document.getElementById("c");
+const ctx = canvas.getContext("2d");
+
+ctx.fillStyle = "blue";
+ctx.fillRect(50, 50, 200, 200);
+
+console.log("Canvas test ran");
+</script>
+
+</body>
+</html>
