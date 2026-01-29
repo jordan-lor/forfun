@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Flappy Bird Enhanced</title>
+<style>
+  body {
+    margin: 0;
+    background: #87CEEB;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    font-family: Arial, sans-serif;
+  }
+  canvas {
+    border: 2px solid black;
+    background: #87CEEB;
+  }
+</style>
+</head>
+<body>
+
+<canvas id="game" width="400" height="500"></canvas>
+
+<script>
+// ---- Canvas Setup ----
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+
+// ---- Images ----
+const playerImg = new Image();
+playerImg.src = "https://i.imgur.com/4KQZkB2.png"; // small bird image
+const cloudImg = new Image();
+cloudImg.src = "https://i.imgur.com/2jF7lYd.png"; // cloud image
+const otherBirdImg = new Image();
+otherBirdImg.src = "https://i.imgur.com/2R1f9oI.png"; // small flying bird
+
+// ---- Player ----
+const birdX = 80;
+const birdRadius = 20; // for collision
+let birdY = 250;
+let birdVelocity = 0;
+const gravity = 0.5;
+const jumpStrength = -8;
+
+// ---- Pipes ----
+let pipeX = canvas.width;
+let gapY = 200;
+const gapHeight = 120;
+
+// ---- Score ----
+let score = 0;
+
+// ---- Clouds ----
+let clouds = [];
+for(let i=0;i<5;i++){
+  clouds.push({x: Math.random()*canvas.width, y: Math.random()*100});
+}
+
+// ---- Other Birds ----
+let otherBirds = [];
+for(let i=0;i<3;i++){
+  otherBirds.push({x: Math.random()*canvas.width, y: Math.random()*200});
+}
+
+// ---- Controls ----
+document.addEventListener("keydown", e=>{
+  if(e.code==="Space"){
+    birdVelocity = jumpStrength;
+  }
+});
+document.addEventListener("touchstart", ()=>{birdVelocity = jumpStrength;});
+
+// ---- Game Loop ----
+function loop(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  // ---- Draw clouds ----
+  clouds.forEach(c=>{
+    c.x -= 0.5;
+    if(c.x < -100) c.x = canvas.width;
+    ctx.drawImage(cloudImg, c.x, c.y, 100, 60);
+  });
+
+  // ---- Draw other flying birds ----
+  otherBirds.forEach(b=>{
+    b.x -= 1.5;
+    if(b.x < -50) b.x = canvas.width;
+    ctx.drawImage(otherBirdImg, b.x, b.y, 50, 30);
+  });
+
+  // ---- Bird physics ----
+  birdVelocity += gravity;
+  birdY += birdVelocity;
+
+  // ---- Draw player bird ----
+  ctx.drawImage(playerImg, birdX-20, birdY-20, 40, 40);
+
+  // ---- Pipe movement ----
+  pipeX -= 2;
+  if(pipeX < -40){
+    pipeX = canvas.width;
+    gapY = Math.random()*250+50;
+    score++; // score when passing pipe
+  }
+
+  // ---- Draw pipes ----
+  ctx.fillStyle="green";
+  ctx.fillRect(pipeX,0,40,gapY);
+  ctx.fillRect(pipeX,gapY+gapHeight,40,canvas.height);
+
+  // ---- Collision detection ----
+  if(birdY<0 || birdY>canvas.height || 
+    (birdX+birdRadius>pipeX && birdX-birdRadius<pipeX+40 &&
+    (birdY-birdRadius<gapY || birdY+birdRadius>gapY+gapHeight))
+  ){
+    // Reset game
+    birdY=250;
+    birdVelocity=0;
+    pipeX=canvas.width;
+    score=0;
+  }
+
+  // ---- Draw score ----
+  ctx.fillStyle="black";
+  ctx.font="20px Arial";
+  ctx.fillText("Score: "+score,10,25);
+
+  requestAnimationFrame(loop);
+}
+
+loop();
+</script>
+
+</body>
+</html>
