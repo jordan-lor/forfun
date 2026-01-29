@@ -2,36 +2,55 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Fly Birdy - Top 10</title>
+<title>Fly Birdy - 2.0</title>
 <style>
   body {
     margin: 0;
     background: #87CEEB;
     display: flex;
-    flex-direction: column;
     justify-content: center;
     align-items: center;
     height: 100vh;
     font-family: Arial, sans-serif;
   }
+
+  #container {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px; /* space between game and leaderboard */
+  }
+
   canvas {
     border: 2px solid black;
     background: #87CEEB;
   }
+
   #leaderboard {
-    margin-top: 10px;
-    width: 400px;
-    text-align: left;
+    width: 200px; /* fixed width */
+    height: 500px; /* same height as canvas */
+    overflow-y: auto;
     background: rgba(255,255,255,0.9);
     padding: 10px;
     border-radius: 5px;
+    box-sizing: border-box;
+  }
+
+  #leaderboard h2 {
+    margin-top: 0;
+    font-size: 18px;
+    text-align: center;
   }
 </style>
 </head>
 <body>
 
-<canvas id="game" width="400" height="500"></canvas>
-<div id="leaderboard"></div>
+<div id="container">
+  <canvas id="game" width="400" height="500"></canvas>
+  <div id="leaderboard">
+    <h2>Top 10 Scores</h2>
+    <div id="scores"></div>
+  </div>
+</div>
 
 <script>
 // ---- Prompt for username ----
@@ -99,13 +118,13 @@ function saveScore(username, score) {
 }
 
 function displayLeaderboard() {
-  const leaderboardDiv = document.getElementById("leaderboard");
+  const scoresDiv = document.getElementById("scores");
   const leaderboard = getLeaderboard();
-  let html = "<strong>Top 10 Scores:</strong><br>";
+  let html = "";
   leaderboard.forEach((entry, i) => {
     html += `${i+1}. ${entry.username}: ${entry.score}<br>`;
   });
-  leaderboardDiv.innerHTML = html;
+  scoresDiv.innerHTML = html;
 }
 
 // ---- Game Loop ----
