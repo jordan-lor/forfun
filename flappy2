@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Flappy Bird Clone</title>
+  <style>
+    body {
+      margin: 0;
+      background: #87CEEB;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      font-family: Arial, sans-serif;
+    }
+    canvas {
+      border: 2px solid black;
+      background: #87CEEB;
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="game" width="400" height="500"></canvas>
+
+<script>
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+
+// ---- Player ----
+let birdY = 250;
+let birdVelocity = 0;
+const gravity = 0.5;
+const jumpStrength = -8;
+const birdX = 80;
+const birdRadius = 12;
+
+// ---- Pipe ----
+let pipeX = canvas.width;
+let gapY = 200;
+const gapHeight = 120;
+
+// ---- Score ----
+let score = 0;
+
+// ---- Controls ----
+document.addEventListener("keydown", (e) => {
+  if (e.code === "Space") {
+    birdVelocity = jumpStrength;
+  }
+});
+
+// ---- Game Loop ----
+function loop() {
+  // Clear screen
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // ---- Bird physics ----
+  birdVelocity += gravity;
+  birdY += birdVelocity;
+
+  // Draw bird
+  ctx.fillStyle = "yellow";
+  ctx.beginPath();
+  ctx.arc(birdX, birdY, birdRadius, 0, Math.PI * 2);
+  ctx.fill();
+
+  // ---- Pipe movement ----
+  pipeX -= 2;
+  if (pipeX < -40) {
+    pipeX = canvas.width;
+    gapY = Math.random() * 250 + 50;
+    score++; // Increase score when passing a pipe
+  }
+
+  // Draw pipes
+  ctx.fillStyle = "green";
+  ctx.fillRect(pipeX, 0, 40, gapY);
+  ctx.fillRect(pipeX, gapY + gapHeight, 40, canvas.height);
+
+  // ---- Collision detection ----
+  if (
+    birdY < 0 || 
+    birdY > canvas.height ||
+    (birdX + birdRadius > pipeX && birdX - birdRadius < pipeX + 40 &&
+     (birdY - birdRadius < gapY || birdY + birdRadius > gapY + gapHeight))
+  ) {
+    // Reset game
+    birdY = 250;
+    birdVelocity = 0;
+    pipeX = canvas.width;
+    score = 0;
+  }
+
+  // ---- Draw score ----
+  ctx.fillStyle = "black";
+  ctx.font = "20px Arial";
+  ctx.fillText("Score: " + score, 10, 25);
+
+  requestAnimationFrame(loop);
+}
+
+// Start the loop
+loop();
+</script>
+
+</body>
+</html>
