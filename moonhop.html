@@ -1,45 +1,94 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Moon Hopper</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body {
-      margin: 0;
-      background: black;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      color: white;
-      font-family: Arial, sans-serif;
-    }
-
-    canvas {
-      background: #050a1a;
-      border: 2px solid #1e90ff;
-    }
-
-    #message {
-      position: absolute;
-      text-align: center;
-      font-size: 22px;
-      pointer-events: none;
-    }
-  </style>
-</head>
-<body>
-
-<canvas id="game" width="400" height="600"></canvas>
-<div id="message"></div>
-
 <script>
-console.log("Moon Hopper loaded");
-
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 const message = document.getElementById("message");
 
+// Game state
+let started = false;
+let gameOver = false;
+let score = 0;
+let frame = 0;
+
 // Player
-let playe
+const player = {
+  x: 80,
+  y: 300,
+  r: 15,
+  vy: 0
+};
+
+const gravity = 0.45;
+const jumpPower = -7;
+let obstacles = [];
+
+// Input
+document.addEventListener("keydown", e => {
+  if (e.code === "Space") action();
+});
+document.addEventListener("click", action);
+
+function action() {
+  if (!started) {
+    started = true;
+    message.innerHTML = "";
+  } else if (gameOver) {
+    reset();
+  } else {
+    player.vy = jumpPower;
+  }
+}
+
+// Reset
+function reset() {
+  started = false;
+  gameOver = false;
+  score = 0;
+  frame = 0;
+  obstacles = [];
+  player.y = 300;
+  player.vy = 0;
+  message.innerHTML = "🚀 Click or press Space to start";
+}
+
+// Obstacles
+function createObstacle() {
+  const gap = 150;
+  const top = Math.random() * 250 + 50;
+
+  obstacles.push({
+    x: canvas.width,
+    top,
+    bottom: top + gap,
+    passed: false
+  });
+}
+
+// Loop
+function loop() {
+  ctx.fillStyle = "#050a1a";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Player
+  ctx.beginPath();
+  ctx.arc(player.x, player.y, player.r, 0, Math.PI * 2);
+  ctx.fillStyle = "#ffb6c1";
+  ctx.fill();
+
+  if (started && !gameOver) {
+    // Physics
+    player.vy += gravity;
+    player.y += player.vy;
+
+    // Obstacles
+    if (frame % 120 === 0) createObstacle();
+
+    obstacles.forEach(obs => {
+      obs.x -= 2.5;
+
+      ctx.fillStyle = "#7df9ff";
+      ctx.fillRect(obs.x, 0, 10, obs.top);
+      ctx.fillRect(obs.x, obs.bottom, 10, canvas.height);
+
+      // Collision
+      if (
+        player.x + player.r >
