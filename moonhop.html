@@ -2,89 +2,23 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Simple Flappy Game</title>
-  <style>
-    body {
-      margin: 0;
-      background: black;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
-
-    canvas {
-      background: #222;
-      border: 2px solid cyan;
-    }
-  </style>
+  <title>Canvas Test</title>
 </head>
 <body>
 
-<canvas id="game" width="400" height="500"></canvas>
+<h1>If you see a blue box below, canvas works.</h1>
+
+<canvas id="c" width="300" height="300" style="border:5px solid red;"></canvas>
 
 <script>
-const canvas = document.getElementById("game");
+const canvas = document.getElementById("c");
 const ctx = canvas.getContext("2d");
 
-// Player
-let y = 250;
-let velocity = 0;
-const gravity = 0.5;
-const jump = -8;
+ctx.fillStyle = "blue";
+ctx.fillRect(50, 50, 200, 200);
 
-// Obstacle
-let pipeX = 400;
-let gapTop = 150;
-const gapSize = 120;
-let score = 0;
+console.log("Canvas test ran");
+</script>
 
-// Input
-document.addEventListener("click", () => {
-  velocity = jump;
-});
-
-// Game loop
-function loop() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  // Background
-  ctx.fillStyle = "#222";
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-  // Player
-  velocity += gravity;
-  y += velocity;
-
-  ctx.fillStyle = "pink";
-  ctx.beginPath();
-  ctx.arc(80, y, 12, 0, Math.PI * 2);
-  ctx.fill();
-
-  // Pipe
-  pipeX -= 2;
-  if (pipeX < -40) {
-    pipeX = canvas.width;
-    gapTop = Math.random() * 200 + 50;
-    score++;
-  }
-
-  ctx.fillStyle = "cyan";
-  ctx.fillRect(pipeX, 0, 30, gapTop);
-  ctx.fillRect(pipeX, gapTop + gapSize, 30, canvas.height);
-
-  // Collision
-  if (
-    y < 0 || y > canvas.height ||
-    (80 > pipeX && 80 < pipeX + 30 &&
-     (y < gapTop || y > gapTop + gapSize))
-  ) {
-    // Reset on death
-    y = 250;
-    velocity = 0;
-    pipeX = canvas.width;
-    score = 0;
-  }
-
-  // Score
-  ctx.fillStyle = "white
+</body>
+</html>
