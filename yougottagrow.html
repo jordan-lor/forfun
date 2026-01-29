@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Challenging Plant Game</title>
+<style>
+  body {
+    margin: 0;
+    background: #cceeff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    font-family: Arial, sans-serif;
+  }
+
+  #game {
+    position: relative;
+    width: 400px;
+    height: 600px;
+    background: #a3d9a5;
+    border: 2px solid #333;
+    overflow: hidden;
+  }
+
+  /* Sun */
+  #sun {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 80px;
+    height: 80px;
+    background: yellow;
+    border-radius: 50%;
+    box-shadow: 0 0 30px yellow;
+  }
+
+  /* Plant */
+  #plant {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 50px;
+    background: green;
+    border-radius: 10px 10px 0 0;
+    transition: height 0.3s, background 0.3s;
+  }
+
+  /* Water drops */
+  .water-drop {
+    position: absolute;
+    width: 15px;
+    height: 15px;
+    background: blue;
+    border-radius: 50%;
+    animation: fall 0.8s forwards;
+  }
+
+  @keyframes fall {
+    0% { opacity: 1; transform: translateY(0); }
+    100% { opacity: 0; transform: translateY(400px); }
+  }
+
+  #message {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255,255,255,0.8);
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-weight: bold;
+  }
+
+  #score {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    background: rgba(255,255,255,0.8);
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-weight: bold;
+  }
+</style>
+</head>
+<body>
+<div id="game">
+  <div id="sun"></div>
+  <div id="plant"></div>
+  <div id="message">Press SPACE to water the plant!</div>
+  <div id="score">Waterings left: 6</div>
+</div>
+
+<script>
+  const plant = document.getElementById("plant");
+  const message = document.getElementById("message");
+  const scoreDisplay = document.getElementById("score");
+
+  // Game variables
+  let waterLevel = 0;
+  const minWater = 2;
+  const maxWater = 6;
+  const stageHeights = [50, 90, 130]; // plant heights for each stage
+  const maxStage = stageHeights.length;
+  let stage = 0;
+  let maxWaterings = 6; // total allowed waterings
+  let wateringsUsed = 0;
+
+  // Plant loses water over time
+  setInterval(() => {
+    if(waterLevel > 0 && stage > 0){
+      waterLevel--;
+      updatePlantColor();
+      if(waterLevel < minWater){
+        message.textContent = "Plant is thirsty!";
+      }
+    }
+  }, 3000); // every 3 seconds
+
+  // Listen for space bar to water
+  document.addEventListener("keydown", (e) => {
+    if(e.code === "Space"){
+      e.preventDefault();
+      if(wateringsUsed < maxWaterings){
+        wateringsUsed++;
+        scoreDisplay.textContent = `Waterings left: ${maxWaterings - wateringsUsed}`;
+        waterPlant();
+      } else {
+        message.textContent = "No water left! Try again next round.";
+      }
+    }
+  });
+
+  function waterPlant(){
+    waterLevel++;
+    updatePlantColor();
+
+    if(waterLevel < minWater){
+      message.textContent = "Plant is thirsty!";
+    } else if(waterLevel > maxWater){
+      plant.style.background = "brown";
+      plant.style.height = stageHeights[0] + "px";
+      message.textContent = "Too much water! Plant died!";
+    } else {
+      if(stage < maxStage){
+        stage++;
+        plant.style.height = stageHeights[stage-1] + "px";
+        message.textContent = "Plant is growing!";
+        if(stage === maxStage){
+          message.textContent = "Plant is fully grown!";
+        }
+      }
+    }
+  }
+
+  function updatePlantColor(){
+    if(waterLevel < minWater){
+      plant.style.background = "darkgreen"; // wilted
+    } else if(waterLevel > maxWater){
+      plant.style.background = "brown"; // overwatered
+    } else {
+      plant.style.background = "green"; // healthy
+    }
+  }
+</script>
+</body>
+</html>
