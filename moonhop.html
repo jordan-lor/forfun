@@ -1,94 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Simple Flappy Game</title>
+  <style>
+    body {
+      margin: 0;
+      background: black;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    canvas {
+      background: #222;
+      border: 2px solid cyan;
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="game" width="400" height="500"></canvas>
+
 <script>
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
-const message = document.getElementById("message");
-
-// Game state
-let started = false;
-let gameOver = false;
-let score = 0;
-let frame = 0;
 
 // Player
-const player = {
-  x: 80,
-  y: 300,
-  r: 15,
-  vy: 0
-};
+let y = 250;
+let velocity = 0;
+const gravity = 0.5;
+const jump = -8;
 
-const gravity = 0.45;
-const jumpPower = -7;
-let obstacles = [];
+// Obstacle
+let pipeX = 400;
+let gapTop = 150;
+const gapSize = 120;
+let score = 0;
 
 // Input
-document.addEventListener("keydown", e => {
-  if (e.code === "Space") action();
+document.addEventListener("click", () => {
+  velocity = jump;
 });
-document.addEventListener("click", action);
 
-function action() {
-  if (!started) {
-    started = true;
-    message.innerHTML = "";
-  } else if (gameOver) {
-    reset();
-  } else {
-    player.vy = jumpPower;
-  }
-}
-
-// Reset
-function reset() {
-  started = false;
-  gameOver = false;
-  score = 0;
-  frame = 0;
-  obstacles = [];
-  player.y = 300;
-  player.vy = 0;
-  message.innerHTML = "🚀 Click or press Space to start";
-}
-
-// Obstacles
-function createObstacle() {
-  const gap = 150;
-  const top = Math.random() * 250 + 50;
-
-  obstacles.push({
-    x: canvas.width,
-    top,
-    bottom: top + gap,
-    passed: false
-  });
-}
-
-// Loop
+// Game loop
 function loop() {
-  ctx.fillStyle = "#050a1a";
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Background
+  ctx.fillStyle = "#222";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   // Player
+  velocity += gravity;
+  y += velocity;
+
+  ctx.fillStyle = "pink";
   ctx.beginPath();
-  ctx.arc(player.x, player.y, player.r, 0, Math.PI * 2);
-  ctx.fillStyle = "#ffb6c1";
+  ctx.arc(80, y, 12, 0, Math.PI * 2);
   ctx.fill();
 
-  if (started && !gameOver) {
-    // Physics
-    player.vy += gravity;
-    player.y += player.vy;
+  // Pipe
+  pipeX -= 2;
+  if (pipeX < -40) {
+    pipeX = canvas.width;
+    gapTop = Math.random() * 200 + 50;
+    score++;
+  }
 
-    // Obstacles
-    if (frame % 120 === 0) createObstacle();
+  ctx.fillStyle = "cyan";
+  ctx.fillRect(pipeX, 0, 30, gapTop);
+  ctx.fillRect(pipeX, gapTop + gapSize, 30, canvas.height);
 
-    obstacles.forEach(obs => {
-      obs.x -= 2.5;
+  // Collision
+  if (
+    y < 0 || y > canvas.height ||
+    (80 > pipeX && 80 < pipeX + 30 &&
+     (y < gapTop || y > gapTop + gapSize))
+  ) {
+    // Reset on death
+    y = 250;
+    velocity = 0;
+    pipeX = canvas.width;
+    score = 0;
+  }
 
-      ctx.fillStyle = "#7df9ff";
-      ctx.fillRect(obs.x, 0, 10, obs.top);
-      ctx.fillRect(obs.x, obs.bottom, 10, canvas.height);
-
-      // Collision
-      if (
-        player.x + player.r >
+  // Score
+  ctx.fillStyle = "white
