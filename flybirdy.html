@@ -30,15 +30,17 @@ const ctx = canvas.getContext("2d");
 
 // ---- Images ----
 const playerImg = new Image();
-playerImg.src = "https://i.imgur.com/4KQZkB2.png"; // small bird image
+playerImg.src = "https://www.nicepng.com/png/detail/183-1831944_flappy-bird-sprite-computer-icons-opengameart-bird-sprite.png";
+
 const cloudImg = new Image();
-cloudImg.src = "https://i.imgur.com/2jF7lYd.png"; // cloud image
+cloudImg.src = "https://clipartmax.com/png/middle/51-512610_clouds-clipart-bird-sky.png";
+
 const otherBirdImg = new Image();
-otherBirdImg.src = "https://i.imgur.com/2R1f9oI.png"; // small flying bird
+otherBirdImg.src = "https://clipartmax.com/png/middle/312-3123910_flappy-bird-sprite-computer-icons-opengameart-clipart-flying-bird.png";
 
 // ---- Player ----
 const birdX = 80;
-const birdRadius = 20; // for collision
+const birdRadius = 20;
 let birdY = 250;
 let birdVelocity = 0;
 const gravity = 0.5;
@@ -54,78 +56,81 @@ let score = 0;
 
 // ---- Clouds ----
 let clouds = [];
-for(let i=0;i<5;i++){
-  clouds.push({x: Math.random()*canvas.width, y: Math.random()*100});
+for(let i = 0; i < 5; i++){
+  clouds.push({ x: Math.random() * canvas.width, y: Math.random() * 100 });
 }
 
 // ---- Other Birds ----
 let otherBirds = [];
-for(let i=0;i<3;i++){
-  otherBirds.push({x: Math.random()*canvas.width, y: Math.random()*200});
+for(let i = 0; i < 3; i++){
+  otherBirds.push({ x: Math.random() * canvas.width, y: Math.random() * 200 });
 }
 
 // ---- Controls ----
-document.addEventListener("keydown", e=>{
-  if(e.code==="Space"){
+document.addEventListener("keydown", (e) => {
+  if (e.code === "Space") {
     birdVelocity = jumpStrength;
   }
 });
-document.addEventListener("touchstart", ()=>{birdVelocity = jumpStrength;});
+document.addEventListener("touchstart", () => {
+  birdVelocity = jumpStrength;
+});
 
 // ---- Game Loop ----
-function loop(){
-  ctx.clearRect(0,0,canvas.width,canvas.height);
+function loop() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  // ---- Draw clouds ----
-  clouds.forEach(c=>{
+  // Draw clouds
+  clouds.forEach(c => {
     c.x -= 0.5;
-    if(c.x < -100) c.x = canvas.width;
+    if (c.x < -150) c.x = canvas.width;
     ctx.drawImage(cloudImg, c.x, c.y, 100, 60);
   });
 
-  // ---- Draw other flying birds ----
-  otherBirds.forEach(b=>{
+  // Draw other flying birds
+  otherBirds.forEach(b => {
     b.x -= 1.5;
-    if(b.x < -50) b.x = canvas.width;
-    ctx.drawImage(otherBirdImg, b.x, b.y, 50, 30);
+    if (b.x < -50) b.x = canvas.width;
+    ctx.drawImage(otherBirdImg, b.x, b.y, 40, 30);
   });
 
-  // ---- Bird physics ----
+  // Bird physics
   birdVelocity += gravity;
   birdY += birdVelocity;
 
-  // ---- Draw player bird ----
-  ctx.drawImage(playerImg, birdX-20, birdY-20, 40, 40);
+  // Draw player bird
+  ctx.drawImage(playerImg, birdX - 20, birdY - 20, 40, 40);
 
-  // ---- Pipe movement ----
+  // Pipe movement
   pipeX -= 2;
-  if(pipeX < -40){
+  if (pipeX < -40) {
     pipeX = canvas.width;
-    gapY = Math.random()*250+50;
-    score++; // score when passing pipe
+    gapY = Math.random() * 250 + 50;
+    score++;
   }
 
-  // ---- Draw pipes ----
-  ctx.fillStyle="green";
-  ctx.fillRect(pipeX,0,40,gapY);
-  ctx.fillRect(pipeX,gapY+gapHeight,40,canvas.height);
+  // Draw pipes
+  ctx.fillStyle = "green";
+  ctx.fillRect(pipeX, 0, 40, gapY);
+  ctx.fillRect(pipeX, gapY + gapHeight, 40, canvas.height);
 
-  // ---- Collision detection ----
-  if(birdY<0 || birdY>canvas.height || 
-    (birdX+birdRadius>pipeX && birdX-birdRadius<pipeX+40 &&
-    (birdY-birdRadius<gapY || birdY+birdRadius>gapY+gapHeight))
-  ){
-    // Reset game
-    birdY=250;
-    birdVelocity=0;
-    pipeX=canvas.width;
-    score=0;
+  // Collision
+  if (
+    birdY < 0 ||
+    birdY > canvas.height ||
+    (birdX + birdRadius > pipeX && birdX - birdRadius < pipeX + 40 &&
+     (birdY - birdRadius < gapY || birdY + birdRadius > gapY + gapHeight))
+  ) {
+    birdY = 250;
+    birdVelocity = 0;
+    pipeX = canvas.width;
+    score = 0;
   }
 
-  // ---- Draw score ----
-  ctx.fillStyle="black";
-  ctx.font="20px Arial";
-  ctx.fillText("Score: "+score,10,25);
+  // Draw score
+  ctx.fillStyle = "black";
+  ctx.font = "20px Arial";
+  ctx.fillText("Score: " + score, 10, 25);
 
   requestAnimationFrame(loop);
 }
